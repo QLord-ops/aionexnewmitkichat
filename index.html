@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AIONEX entwickelt KI-Automatisierungen, Websites, CRM-Systeme und individuelle Software für Unternehmen in Deutschland.">
+  <title>AIONEX — KI-Automatisierung & individuelle Software</title>
+  <script>
+    document.documentElement.dataset.theme =
+      localStorage.getItem('aionex-theme') ||
+      (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="cookies.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><path d="M9 12h.01M15 12h.01M12 7V4m-2 0h4"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M19 13h2v-2a2 2 0 1 0-4 0v2h-4v-4h2a2 2 0 1 0 0-4h-2V3H9v2a2 2 0 1 1-4 0V3H3v6h2a2 2 0 1 1 0 4H3v8h8v-2a2 2 0 1 1 4 0v2h6v-6h-2a2 2 0 1 1 0-4Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2M3 9l6-4 6 4 6-6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h8l-1 8 9-12h-8l1-8Z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M15 9 21 3m-3 0h3v3"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21h18M6 21V5l9-3v19m3 0V9h-3M9 7h2m-2 4h2m-2 4h2"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 2 1.6 5.1L19 9l-5.4 1.9L12 16l-1.6-5.1L5 9l5.4-1.9L12 2Zm7 12 .8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14Z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8 8 0 0 1-8.5 8A9 9 0 0 1 7 17.8L3 19l1.3-3.7A8 8 0 1 1 21 11.5Z"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="logo logo-image" href="#top" aria-label="AIONEX Startseite"><img src="assets/aionex-logo.png" alt="AIONEX — Digital Systems & Automation"></a>
+      <nav class="desktop-nav" aria-label="Hauptnavigation">
+        <a href="#solutions">Leistungen</a>
+        <a href="#services">Lösungen</a>
+        <a href="#case-study">Case Studies</a>
+        <a href="#why">Über uns</a>
+        <a href="#faq">Ressourcen</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" aria-label="Zur hellen Ansicht wechseln" aria-pressed="false">
+          <svg class="theme-icon theme-icon-sun"><use href="#i-sun"/></svg>
+          <svg class="theme-icon theme-icon-moon"><use href="#i-moon"/></svg>
+          <span class="theme-label">Light</span>
+        </button>
+        <a class="btn btn-gold desktop-only consultation-trigger" href="#contact">Kostenlose Erstberatung <svg><use href="#i-arrow"/></svg></a>
+        <button class="menu-toggle" aria-label="Menü öffnen" aria-expanded="false"><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu">
+      <a href="#solutions">Leistungen</a><a href="#services">Lösungen</a><a href="#case-study">Case Studies</a><a href="#why">Über uns</a><a href="#faq">Ressourcen</a>
+      <a class="btn btn-gold consultation-trigger" href="#contact">Kostenlose Erstberatung</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero section-grid">
+      <div class="network network-left"></div><div class="network network-right"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow">Digitale Systeme für messbares Wachstum</div>
+          <h1>KI-Automatisierung & individuelle Software, <span>die Leads gewinnt und Prozesse automatisiert</span></h1>
+          <p class="lead">AIONEX hilft Unternehmen in Deutschland, Anfragen sofort zu beantworten, manuelle Arbeit zu reduzieren und mit Chatbots, Automationen und individuellen Systemen mehr Umsatz zu erzielen.</p>
+          <div class="mini-benefits">
+            <span><i>✓</i> Antwortet 24/7</span><span><i>✓</i> Verpasst keine Leads</span><span><i>✓</i> Individuell für Ihr Business</span>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-gold btn-large consultation-trigger" href="#contact">Kostenlose Erstberatung <svg><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost btn-large" href="#case-study"><span class="play">▶</span> Referenzen ansehen</a>
+          </div>
+          <div class="trust-line"><span>◉ Kostenlos & unverbindlich</span><span>◷ In 24h Rückmeldung</span><span>♢ 100% DSGVO-konform</span></div>
+        </div>
+        <div class="hero-visual reveal">
+          <div class="dashboard">
+            <div class="dash-side"><b>AIONEX</b><span>▦ Übersicht</span><span>♙ Leads</span><span>◫ Anfragen</span><span>⚙ Prozesse</span></div>
+            <div class="dash-main">
+              <div class="dash-title">Performance Übersicht <em>● Aktiv</em></div>
+              <div class="dash-stats"><div><small>Leads</small><strong>487</strong><i>+28%</i></div><div><small>Antwortquote</small><strong>98%</strong><i>+14%</i></div><div><small>Zeit gespart</small><strong>20.3 h</strong><i>pro Woche</i></div></div>
+              <div class="chart"><span>Leads über Zeit</span><svg viewBox="0 0 420 120" preserveAspectRatio="none"><defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6a92f" stop-opacity=".35"/><stop offset="1" stop-color="#e6a92f" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 100 C25 96 35 75 60 82 S95 52 120 67 S155 35 180 54 S215 28 240 45 S270 13 300 32 S345 17 375 22 S405 8 420 10 L420 120 L0 120Z"/><path d="M0 100 C25 96 35 75 60 82 S95 52 120 67 S155 35 180 54 S215 28 240 45 S270 13 300 32 S345 17 375 22 S405 8 420 10"/></svg></div>
+            </div>
+          </div>
+          <div class="chat-card floating-card"><b>Website Chat</b><div class="bot-row"><span>AI</span><p><strong>AI Assistent</strong><small>● Online</small></p></div><p class="bubble">Hallo! Wie können wir Ihnen heute weiterhelfen?</p><button class="consultation-trigger" type="button">Beratung vereinbaren</button></div>
+          <div class="lead-card floating-card"><b>Neuer Lead <em>CRM</em></b><span>Max Mustermann</span><span>m.mustermann@firma.de</span><span>+49 151 12345678</span><i>Qualifiziert</i></div>
+          <img class="consultant" src="assets/consultant.png" alt="AIONEX Berater mit Headset und Tablet">
+        </div>
+      </div>
+      <div class="container hero-benefits reveal">
+        <article class="outcome-card">
+          <div class="outcome-icon"><svg><use href="#i-chart"/></svg></div>
+          <h3>Mehr Anfragen</h3>
+          <p>Durch bessere Websites,<br>Prozesse und Automationen.</p>
+        </article>
+        <article class="outcome-card">
+          <div class="outcome-icon"><svg><use href="#i-clock"/></svg></div>
+          <h3>Weniger manuelle Arbeit</h3>
+          <p>Routine wird automatisiert.<br>Ihr Team spart Zeit.</p>
+        </article>
+        <article class="outcome-card">
+          <div class="outcome-icon"><svg><use href="#i-window"/></svg></div>
+          <h3>Mehr Übersicht</h3>
+          <p>Leads, CRM und Prozesse<br>an einem Ort.</p>
+        </article>
+        <article class="outcome-card">
+          <div class="outcome-icon"><svg><use href="#i-chart"/></svg></div>
+          <h3>Skalierbare Systeme</h3>
+          <p>Lösungen, die mit Ihrem<br>Unternehmen wachsen.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section solutions" id="solutions">
+      <div class="network network-right"></div>
+      <div class="container solutions-grid">
+        <div class="reveal">
+          <div class="section-kicker">Lösungen</div>
+          <h2>Digitale Lösungen, die Anfragen in Prozesse und Prozesse in <span>Wachstum</span> verwandeln</h2>
+          <p class="section-text">AIONEX entwickelt Websites, Kundenportale, CRM-Systeme und KI-Automatisierungen für Unternehmen, die weniger manuelle Arbeit, schnellere Abläufe und mehr qualifizierte Leads wollen.</p>
+          <div class="solution-cards">
+            <article class="mini-card"><div class="icon"><svg><use href="#i-bot"/></svg></div><div><h3>KI-Automatisierung & Chatbots</h3><p>Antwortet sofort, qualifiziert Leads und entlastet Ihr Team.</p></div></article>
+            <article class="mini-card"><div class="icon"><svg><use href="#i-window"/></svg></div><div><h3>Websites & Landingpages</h3><p>Verkaufsstarke Seiten, die Vertrauen aufbauen.</p></div></article>
+            <article class="mini-card"><div class="icon"><svg><use href="#i-users"/></svg></div><div><h3>Kundenportale & Web-Lösungen</h3><p>Individuelle Plattformen für Kunden und Teams.</p></div></article>
+            <article class="mini-card"><div class="icon"><svg><use href="#i-puzzle"/></svg></div><div><h3>CRM & Systemintegration</h3><p>Anfragen, Daten und Abläufe in einem System.</p></div></article>
+          </div>
+        </div>
+        <div class="process-panel reveal">
+          <div class="panel-head"><b>Ihr automatisierter Prozess mit AIONEX</b><span>● Aktiv</span></div>
+          <div class="process-flow">
+            <div class="process-step"><div class="icon"><svg><use href="#i-users"/></svg></div><b>Lead</b><p>Neue Anfrage über Website oder Formular.</p><i>Erfasst</i></div>
+            <div class="process-step"><div class="icon"><svg><use href="#i-bot"/></svg></div><b>Chatbot</b><p>KI antwortet und qualifiziert.</p><i>Qualifiziert</i></div>
+            <div class="process-step"><div class="icon"><svg><use href="#i-puzzle"/></svg></div><b>CRM</b><p>Lead wird automatisch gespeichert.</p><i>Gespeichert</i></div>
+            <div class="process-step"><div class="icon">€</div><b>Angebot</b><p>Personalisiert erstellt und versendet.</p><i>Versendet</i></div>
+            <div class="process-step"><div class="icon">↗</div><b>Projektstart</b><p>Team informiert, Prozess startet.</p><i>Gestartet</i></div>
+          </div>
+          <div class="process-metrics"><div><svg><use href="#i-clock"/></svg><b>−80%</b><span>Manuelle Arbeit</span></div><div><svg><use href="#i-chart"/></svg><b>+46%</b><span>Qualifizierte Leads</span></div><div><svg><use href="#i-bolt"/></svg><b>+35%</b><span>Schnellere Abläufe</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section services" id="services">
+      <div class="container framed reveal">
+        <div class="section-heading centered">
+          <div class="section-kicker">Was wir für Sie bauen</div>
+          <h2>Digitale Lösungen für<br>Wachstum und Effizienz</h2>
+          <p class="section-text">Systeme, die Leads gewinnen, Prozesse automatisieren und Abläufe skalierbar machen.</p>
+        </div>
+        <div class="service-grid">
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-bot"/></svg></div><h3>KI-Automatisierungen</h3><p>Wiederkehrende Aufgaben automatisieren und wertvolle Zeit sparen.</p><ul><li>Workflows</li><li>KI-Agenten</li><li>Automationen</li></ul></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-window"/></svg></div><h3>Websites & Landingpages</h3><p>Verkaufsstarke Auftritte für mehr Anfragen und Conversion.</p><ul><li>Leadgenerierung</li><li>Conversion</li><li>Premium Design</li></ul></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-users"/></svg></div><h3>CRM & Kundenportale</h3><p>Zentrale Systeme für Kunden, Leads und interne Prozesse.</p><ul><li>CRM</li><li>Portale</li><li>Struktur</li></ul></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-puzzle"/></svg></div><h3>Individuelle Web-Apps</h3><p>Maßgeschneiderte Lösungen für spezifische Geschäftsprozesse.</p><ul><li>Custom Software</li><li>Schnittstellen</li><li>Skalierung</li></ul></article>
+        </div>
+        <div class="center-cta"><a href="#contact" class="btn btn-gold btn-large consultation-trigger">Kostenlose Erstberatung <svg><use href="#i-arrow"/></svg></a><div class="trust-line"><span>✓ Unverbindlich & kostenlos</span><span>✓ In 24h Rückmeldung</span><span>✓ 100% DSGVO-konform</span></div></div>
+      </div>
+    </section>
+
+    <section class="section why" id="why">
+      <div class="container framed reveal">
+        <div class="section-heading centered"><div class="section-kicker">Warum AIONEX</div><h2>Warum Unternehmen <span>AIONEX wählen</span></h2><p class="section-text">Klare Prozesse, messbare Ergebnisse und individuelle Systeme für nachhaltiges Wachstum.</p></div>
+        <div class="why-grid">
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-clock"/></svg></div><h3>Schnelle Reaktionszeiten</h3><p>Anfragen werden schneller bearbeitet.</p></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-puzzle"/></svg></div><h3>Individuelle Lösungen</h3><p>Keine Standardlösungen von der Stange.</p></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-shield"/></svg></div><h3>DSGVO-konform</h3><p>Prozesse für den deutschen Markt.</p></article>
+          <article class="feature-card"><div class="icon round"><svg><use href="#i-chart"/></svg></div><h3>Messbare Effizienz</h3><p>Weniger manuelle Arbeit, mehr Fokus auf Vertrieb.</p></article>
+        </div>
+        <div class="wide-metrics"><div><svg><use href="#i-clock"/></svg><b>24/7</b><span>erreichbar</span></div><div><svg><use href="#i-chart"/></svg><b>20+</b><span>Std./Woche sparen</span></div><div><svg><use href="#i-puzzle"/></svg><b>CRM &</b><span>Automationen</span></div><div><svg><use href="#i-bolt"/></svg><b>Schnelle</b><span>Umsetzung</span></div></div>
+        <div class="capabilities-bar" aria-label="AIONEX Leistungen">
+          <div><svg><use href="#i-globe"/></svg><b>Websites</b></div>
+          <div><svg><use href="#i-grid"/></svg><b>Portale</b></div>
+          <div><svg><use href="#i-users"/></svg><b>CRM</b></div>
+          <div><svg><use href="#i-sparkle"/></svg><b>KI-Automation</b></div>
+          <div><svg><use href="#i-chat"/></svg><b>Chatbots</b></div>
+          <div><svg><use href="#i-link"/></svg><b>Integrationen</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section case-study" id="case-study">
+      <div class="container">
+        <div class="section-heading centered reveal"><div class="section-kicker">☆ Case Study</div><h2>Ergebnisse aus <span>echten Projekten</span></h2><p class="section-text">Wie individuelle Systeme Prozesse verbessern und Anfragen effizienter machen.</p></div>
+        <div class="case-grid">
+          <article class="case-copy feature-card reveal"><div class="section-kicker">▥ Dienstleistungsunternehmen</div><h3>Mehr Struktur, schnellere Bearbeitung und bessere Lead-Qualität</h3><p>Ein mittelständisches Dienstleistungsunternehmen hatte mit vielen unqualifizierten Anfragen, manuellen Prozessen und langen Reaktionszeiten zu kämpfen. AIONEX implementierte eine individuelle Lösung aus Website, CRM und Automationen.</p><div class="case-points"><span>◎ Automatische Lead-Qualifizierung</span><span>⌘ CRM-Integration & Nachverfolgung</span><span>ϟ Schnelle Reaktionszeiten</span></div><a href="#contact" class="btn btn-gold btn-large">Referenzen ansehen <svg><use href="#i-arrow"/></svg></a></article>
+          <div class="case-dashboard reveal">
+            <div class="case-top"><b>Performance Überblick</b><span>01.05. – 31.05.2026</span></div>
+            <div class="case-stats"><div><small>Leads</small><b>612</b><i>+38%</i></div><div><small>Qualifizierte Leads</small><b>312</b><i>+38%</i></div><div><small>Antwortquote</small><b>94%</b><i>+21%</i></div><div><small>Reaktionszeit</small><b>4:32 Min.</b><i>−27%</i></div></div>
+            <div class="big-chart"><span>Leads über Zeit</span><svg viewBox="0 0 760 190" preserveAspectRatio="none"><defs><linearGradient id="bigFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3b43f" stop-opacity=".36"/><stop offset="1" stop-color="#f3b43f" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 160 C80 150 90 115 150 130 S240 90 300 110 S390 50 450 75 S540 35 600 55 S680 12 760 18 L760 190 L0 190Z"/><path d="M0 160 C80 150 90 115 150 130 S240 90 300 110 S390 50 450 75 S540 35 600 55 S680 12 760 18"/></svg></div>
+            <div class="result-row"><div><svg><use href="#i-chart"/></svg><b>+38%</b><span>qualifizierte Leads</span></div><div><svg><use href="#i-clock"/></svg><b>−27%</b><span>manuelle Arbeit</span></div><div><svg><use href="#i-bolt"/></svg><b>&lt; 5 Min.</b><span>Reaktionszeit</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section" id="faq">
+      <div class="container faq-grid">
+        <div class="reveal"><div class="section-kicker">FAQ</div><h2>Häufige Fragen</h2><p class="section-text">Antworten auf typische Fragen vor dem Start eines Projekts.</p>
+          <div class="accordion">
+            <article><button><span><i>?</i> Wie schnell kann ein Projekt starten?</span><b>⌄</b></button><div><p>Nach dem Erstgespräch erhalten Sie innerhalb weniger Tage einen konkreten Projektplan. Kleine Automationen können oft innerhalb von 1–2 Wochen starten.</p></div></article>
+            <article><button><span><i>?</i> Arbeitet AIONEX individuell oder mit Templates?</span><b>⌄</b></button><div><p>Jede Lösung wird auf Ihre Prozesse zugeschnitten. Bewährte Komponenten beschleunigen die Umsetzung, ohne die Individualität einzuschränken.</p></div></article>
+            <article><button><span><i>?</i> Sind Integrationen mit bestehenden Tools möglich?</span><b>⌄</b></button><div><p>Ja. Wir verbinden unter anderem CRM, E-Mail, Kalender, Formulare, WhatsApp und interne Systeme über sichere Schnittstellen.</p></div></article>
+            <article><button><span><i>?</i> Ist die Lösung DSGVO-konform?</span><b>⌄</b></button><div><p>Datenschutz wird von Beginn an berücksichtigt – mit passenden Hosting-, Zugriffs- und Löschkonzepten für den deutschen Markt.</p></div></article>
+            <article><button><span><i>?</i> Gibt es Betreuung nach dem Launch?</span><b>⌄</b></button><div><p>Ja. Wir übernehmen Monitoring, Weiterentwicklung, Support und die laufende Optimierung Ihrer Systeme.</p></div></article>
+          </div>
+        </div>
+        <aside class="contact-card reveal" id="contact">
+          <div class="icon round"><svg><use href="#i-users"/></svg></div><h2>Lassen Sie uns über <span>Ihr Projekt</span> sprechen</h2><p>In einer kostenlosen Erstberatung klären wir Potenziale, passende Lösungen und die nächsten Schritte.</p><a class="btn btn-gold btn-large consultation-trigger" href="#contact">Kostenlose Erstberatung <svg><use href="#i-arrow"/></svg></a><hr>
+          <ul><li><svg><use href="#i-shield"/></svg> Kostenlos & unverbindlich</li><li><svg><use href="#i-clock"/></svg> Rückmeldung in 24h</li><li><svg><use href="#i-building"/></svg> Für Unternehmen in Deutschland</li></ul>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+      <div class="footer-cta reveal">
+        <div><div class="section-kicker">Bereit für den nächsten Schritt?</div><h2>Aus manuellen Abläufen werden <span>skalierbare Systeme.</span></h2></div>
+        <a class="btn btn-gold btn-large consultation-trigger" href="#contact">Projekt besprechen <svg><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="footer-main">
+        <div class="footer-brand"><a class="logo logo-image footer-logo" href="#top"><img src="assets/aionex-logo.png" alt="AIONEX — Digital Systems & Automation"></a><p>KI-Automatisierung, Websites und individuelle Software für Unternehmen, die schneller und strukturierter wachsen wollen.</p><div class="footer-contact"><a href="mailto:aionex.info@gmail.com"><svg><use href="#i-mail"/></svg> aionex.info@gmail.com</a><a href="tel:+491622674557"><svg><use href="#i-phone"/></svg> +49 162 2674557</a></div></div>
+        <div><h4>Leistungen</h4><a href="#services">KI-Automatisierung</a><a href="#services">Websites & Landingpages</a><a href="#services">CRM & Kundenportale</a><a href="#services">Individuelle Web-Apps</a></div>
+        <div><h4>Unternehmen</h4><a href="#why">Über AIONEX</a><a href="#case-study">Case Studies</a><a href="#faq">FAQ</a><a href="#contact">Kontakt</a></div>
+        <div><h4>Rechtliches</h4><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="cookies.html">Cookie-Richtlinie</a><button class="footer-cookie-link cookie-settings-trigger" type="button">Cookie-Einstellungen</button><span class="status">● Systeme operational</span></div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 AIONEX. Alle Rechte vorbehalten.</span><span>Entwickelt in Deutschland · DSGVO-konform</span><a href="#top">Nach oben ↑</a></div>
+    </div>
+  </footer>
+
+  <div class="ai-chat" id="ai-chat">
+    <div class="ai-chat-launch-wrap">
+      <span class="ai-chat-hint">KI-Assistent · 24/7</span>
+      <button class="ai-chat-launch" type="button" aria-label="AIONEX KI-Assistent öffnen" aria-expanded="false">
+        <svg><use href="#i-bot"/></svg><b>AI</b>
+      </button>
+    </div>
+    <section class="ai-chat-panel" aria-hidden="true" aria-label="AIONEX KI-Assistent">
+      <header class="ai-chat-header">
+        <div class="ai-bot-avatar"><svg><use href="#i-bot"/></svg></div>
+        <div><strong>AIONEX KI-Assistent</strong><span><i></i> <em class="ai-engine-status">Verbindung wird geprüft…</em></span></div>
+        <button class="ai-chat-close" type="button" aria-label="Chat schließen">×</button>
+      </header>
+      <div class="ai-chat-body">
+        <div class="ai-message ai-message-assistant">
+          <div class="ai-mini-avatar"><svg><use href="#i-bot"/></svg></div>
+          <p>Hallo! Ich bin der AIONEX KI-Assistent. Fragen Sie mich zu Websites, Automatisierung, CRM, individuellen Anwendungen oder Preisen.</p>
+        </div>
+        <div class="ai-chat-starters">
+          <button type="button">Was kostet eine Website?</button>
+          <button type="button">Was können wir automatisieren?</button>
+          <button type="button">Ich brauche ein CRM</button>
+        </div>
+        <div class="ai-chat-messages" aria-live="polite"></div>
+        <div class="ai-chat-typing" hidden><div class="ai-mini-avatar"><svg><use href="#i-bot"/></svg></div><span><i></i><i></i><i></i></span></div>
+        <div class="ai-chat-error" role="alert" hidden></div>
+      </div>
+      <div class="ai-chat-meta"><span>Powered by AIONEX AI</span><button class="ai-chat-consultation" type="button">Kostenlos beraten lassen →</button></div>
+      <form class="ai-chat-form">
+        <input type="text" maxlength="500" autocomplete="off" placeholder="Ihre Nachricht…" aria-label="Nachricht an den KI-Assistenten">
+        <button type="submit" aria-label="Nachricht senden"><svg><use href="#i-arrow"/></svg></button>
+      </form>
+    </section>
+  </div>
+
+  <div class="lead-modal" id="lead-modal" aria-hidden="true">
+    <div class="lead-modal-backdrop" data-modal-close></div>
+    <section class="lead-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
+      <button class="lead-modal-close" type="button" aria-label="Formular schließen" data-modal-close>×</button>
+      <div class="lead-modal-icon"><svg><use href="#i-users"/></svg></div>
+      <div class="section-kicker">Kostenlose Erstberatung</div>
+      <h2 id="lead-modal-title">Lassen Sie uns über Ihr Projekt sprechen</h2>
+      <p>Hinterlassen Sie Ihre Kontaktdaten. Wir melden uns innerhalb von 24 Stunden bei Ihnen.</p>
+      <form class="lead-form" id="lead-form">
+        <div class="form-grid">
+          <label><span>Vorname</span><input name="firstName" type="text" autocomplete="given-name" required placeholder="Max"></label>
+          <label><span>Nachname</span><input name="lastName" type="text" autocomplete="family-name" required placeholder="Mustermann"></label>
+          <label><span>Telefonnummer</span><input name="phone" type="tel" autocomplete="tel" required placeholder="+49 162 2674557"></label>
+          <label><span>E-Mail</span><input name="email" type="email" autocomplete="email" required placeholder="max@unternehmen.de"></label>
+        </div>
+        <label class="form-consent"><input name="consent" type="checkbox" required><span>Ich stimme der Verarbeitung meiner Daten zur Kontaktaufnahme zu.</span></label>
+        <button class="btn btn-gold btn-large form-submit" type="submit">Kostenloses Gespräch anfragen <svg><use href="#i-arrow"/></svg></button>
+        <p class="form-note"><svg><use href="#i-shield"/></svg> Vertraulich, unverbindlich und DSGVO-konform.</p>
+        <div class="form-success" role="status" aria-live="polite">Vielen Dank! Ihre Anfrage wurde gespeichert. Wir melden uns innerhalb von 24 Stunden.</div>
+      </form>
+    </section>
+  </div>
+  <script src="cookies.js?v=1"></script>
+  <script src="script.js?v=4"></script>
+</body>
+</html>
