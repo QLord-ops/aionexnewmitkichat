@@ -103,16 +103,113 @@ document.querySelectorAll('.accordion article').forEach(item => {
   });
 });
 
+// Premium Animation Logic
+function animateValue(obj) {
+  if (obj.classList.contains('animated')) return;
+  obj.classList.add('animated');
+  const target = parseFloat(obj.getAttribute('data-target'));
+  const decimals = parseInt(obj.getAttribute('data-decimals') || '0', 10);
+  const duration = 1200; // ms
+  let startTimestamp = null;
+  
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    // easeOutCubic easing
+    const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+    const currentValue = easeOutCubic * target;
+    obj.textContent = currentValue.toFixed(decimals);
+    
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      obj.textContent = target.toFixed(decimals);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
+      if (entry.target.classList.contains('reveal-stagger')) {
+        const children = entry.target.querySelectorAll('.reveal-fade, .reveal-slide-up, .reveal-slide-down, .reveal-slide-left, .reveal-slide-right, .reveal-scale');
+        children.forEach((child, index) => {
+          child.style.transitionDelay = `${index * 110}ms`;
+          child.classList.add('visible');
+          
+          // Animate nested stats
+          child.querySelectorAll('.stat-count').forEach(animateValue);
+          
+          // Animate nested SVG draw paths
+          child.querySelectorAll('.animate-draw').forEach(path => {
+            const length = path.getTotalLength();
+            path.style.strokeDasharray = length;
+            path.style.strokeDashoffset = length;
+            path.getBoundingClientRect(); // trigger reflow
+            path.classList.add('drawn');
+          });
+        });
+        entry.target.classList.add('visible');
+      } else {
+        entry.target.classList.add('visible');
+        
+        // Animate stats directly in this element
+        entry.target.querySelectorAll('.stat-count').forEach(animateValue);
+        
+        // Animate SVG draw paths directly in this element
+        entry.target.querySelectorAll('.animate-draw').forEach(path => {
+          const length = path.getTotalLength();
+          path.style.strokeDasharray = length;
+          path.style.strokeDashoffset = length;
+          path.getBoundingClientRect(); // trigger reflow
+          path.classList.add('drawn');
+        });
+      }
       observer.unobserve(entry.target);
     }
   });
 }, { threshold: 0.08 });
 
-document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
+// Observe all reveal classes
+const revealSelectors = [
+  '.reveal',
+  '.reveal-fade',
+  '.reveal-slide-up',
+  '.reveal-slide-down',
+  '.reveal-slide-left',
+  '.reveal-slide-right',
+  '.reveal-scale',
+  '.reveal-stagger'
+];
+document.querySelectorAll(revealSelectors.join(',')).forEach(element => observer.observe(element));
+
+// 3D Tilt Hover Effects
+document.querySelectorAll('.tilt-hover').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = -(y - centerY) / (rect.height / 18); // Max 10 deg tilt
+    const rotateY = (x - centerX) / (rect.width / 18);
+    
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  
+  card.addEventListener('mouseleave', () => {
+    if (card.classList.contains('dashboard')) {
+      card.style.transform = 'perspective(1000px) rotateY(-2deg)';
+    } else {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+    }
+  });
+});
+
 
 // AIONEX AI chat — adapted from the Corex ChatWidget API contract.
 const aiChat = document.querySelector('#ai-chat');
