@@ -1,0 +1,16 @@
+DirectoryIndex index.html
+ErrorDocument 404 /index.html
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  <FilesMatch "\.(css|js|png|jpg|jpeg|webp|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "public, max-age=300"
+  </FilesMatch>
+</IfModule>

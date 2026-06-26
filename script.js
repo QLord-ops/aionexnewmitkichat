@@ -2,6 +2,10 @@ const menuButton = document.querySelector('.menu-toggle');
 const mobileMenu = document.querySelector('.mobile-menu');
 const mobileMenuBackdrop = document.querySelector('.mobile-menu-backdrop');
 const themeButton = document.querySelector('.theme-toggle');
+const AIONEX_RENDER_API = 'https://aionexnewmitkichat.onrender.com';
+const AIONEX_API_BASE = window.AIONEX_CHAT_API || (
+  window.location.hostname.endsWith('aionex.studio') ? AIONEX_RENDER_API : window.location.origin
+);
 const mobileNavQuery = window.matchMedia('(max-width: 640px)');
 let lastNavScrollY = window.scrollY;
 let navScrollTicking = false;
@@ -138,10 +142,16 @@ leadForm?.addEventListener('submit', async event => {
     consent: data.consent === 'on',
   };
 
+  const originalSubmitHtml = submitButton.innerHTML;
+  const sendingText = (document.documentElement.lang || 'de').startsWith('en')
+    ? 'Sending request...'
+    : 'Anfrage wird gesendet...';
   submitButton.disabled = true;
+  submitButton.textContent = sendingText;
   leadForm.classList.remove('has-error');
+  if (formSuccess) formSuccess.textContent = sendingText;
   try {
-    const response = await fetch('/api/lead', {
+    const response = await fetch(`${AIONEX_API_BASE}/api/lead`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -164,6 +174,7 @@ leadForm?.addEventListener('submit', async event => {
     leadForm.classList.add('has-error');
   } finally {
     submitButton.disabled = false;
+    submitButton.innerHTML = originalSubmitHtml;
   }
 });
 
@@ -382,7 +393,7 @@ const aiEngineStatus = aiChat?.querySelector('.ai-engine-status');
 const AI_CHAT_STORAGE = 'aionex_chat_v2';
 const AI_SESSION_STORAGE = 'aionex_chat_session';
 const AI_LEAD_SENT_STORAGE = 'aionex_chat_lead_sent';
-const AI_CHAT_API = window.AIONEX_CHAT_API || 'http://127.0.0.1:8000';
+const AI_CHAT_API = AIONEX_API_BASE;
 let aiMessages = [];
 let aiStreaming = false;
 
@@ -426,7 +437,7 @@ async function sendChatLeadIfReady() {
   if (!lead) return;
 
   try {
-    const response = await fetch('/api/lead', {
+    const response = await fetch(`${AIONEX_API_BASE}/api/lead`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(lead),

@@ -88,6 +88,7 @@ def send_lead_email(lead: LeadRequest):
     smtp_password = os.getenv("SMTP_PASSWORD")
     smtp_from = os.getenv("SMTP_FROM_EMAIL") or smtp_user
     smtp_to = os.getenv("LEAD_TO_EMAIL", "aionex.info@gmail.com")
+    smtp_use_ssl = os.getenv("SMTP_USE_SSL", "").lower() in {"1", "true", "yes"} or smtp_port == 465
 
     if not all([smtp_host, smtp_user, smtp_password, smtp_from, smtp_to]):
         raise RuntimeError("SMTP is not configured")
@@ -116,10 +117,15 @@ def send_lead_email(lead: LeadRequest):
     )
 
     context = ssl.create_default_context(cafile=certifi.where())
-    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
-        smtp.starttls(context=context)
-        smtp.login(smtp_user, smtp_password)
-        smtp.send_message(message)
+    if smtp_use_ssl:
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=20, context=context) as smtp:
+            smtp.login(smtp_user, smtp_password)
+            smtp.send_message(message)
+    else:
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
+            smtp.starttls(context=context)
+            smtp.login(smtp_user, smtp_password)
+            smtp.send_message(message)
 
 
 @app.get("/api/health")
