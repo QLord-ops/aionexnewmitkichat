@@ -25,7 +25,7 @@
       localStorage.getItem('aionex-theme') ||
       (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
   </script>
-  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="styles.css?v=24">
   <link rel="stylesheet" href="cookies.css">
   <script type="application/ld+json">
     {
@@ -117,7 +117,7 @@
           </div>
           <div class="hero-actions">
             <a class="btn btn-gold btn-large consultation-trigger" href="#contact">Kostenlose Erstberatung <svg><use href="#i-arrow"/></svg></a>
-            <a class="btn btn-ghost btn-large" href="#case-study"><span class="play">▶</span> Referenzen ansehen</a>
+            <a class="btn btn-ghost btn-large" href="#case-study"><span class="play" aria-hidden="true"></span> Referenzen ansehen</a>
           </div>
           <div class="trust-line"><span>◉ Kostenlos & unverbindlich</span><span>◷ In 24h Rückmeldung</span><span>♢ 100% DSGVO-konform</span></div>
         </div>
@@ -184,7 +184,7 @@
             <div class="process-step reveal-scale"><div class="icon"><svg><use href="#i-bot"/></svg></div><b>Chatbot</b><p>KI antwortet und qualifiziert.</p><i>Qualifiziert</i></div>
             <div class="process-step reveal-scale"><div class="icon"><svg><use href="#i-puzzle"/></svg></div><b>CRM</b><p>Lead wird automatisch gespeichert.</p><i>Gespeichert</i></div>
             <div class="process-step reveal-scale"><div class="icon">€</div><b>Angebot</b><p>Personalisiert erstellt und versendet.</p><i>Versendet</i></div>
-            <div class="process-step reveal-scale"><div class="icon">↗</div><b>Projektstart</b><p>Team informiert, Prozess startet.</p><i>Gestartet</i></div>
+            <div class="process-step reveal-scale"><div class="icon"><svg><use href="#i-arrow"/></svg></div><b>Projektstart</b><p>Team informiert, Prozess startet.</p><i>Gestartet</i></div>
           </div>
           <div class="process-metrics">
             <div><svg><use href="#i-clock"/></svg><b>−<span class="stat-count" data-target="80">0</span>%</b><span>Manuelle Arbeit</span></div>
@@ -362,6 +362,6 @@
     </section>
   </div>
   <script src="cookies.js?v=2"></script>
-  <script src="script.js?v=15"></script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>

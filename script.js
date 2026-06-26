@@ -2,6 +2,9 @@ const menuButton = document.querySelector('.menu-toggle');
 const mobileMenu = document.querySelector('.mobile-menu');
 const mobileMenuBackdrop = document.querySelector('.mobile-menu-backdrop');
 const themeButton = document.querySelector('.theme-toggle');
+const mobileNavQuery = window.matchMedia('(max-width: 640px)');
+let lastNavScrollY = window.scrollY;
+let navScrollTicking = false;
 
 function syncThemeButton() {
   const isLight = document.documentElement.dataset.theme === 'light';
@@ -182,6 +185,44 @@ mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click',
   mobileMenu.classList.remove('open');
   setMobileMenuOpen(false);
 }));
+
+function syncMobileNavOnScroll() {
+  if (!mobileNavQuery.matches) {
+    document.body.classList.remove('nav-hidden', 'nav-elevated');
+    lastNavScrollY = window.scrollY;
+    return;
+  }
+
+  const currentScrollY = window.scrollY;
+  const scrollingDown = currentScrollY > lastNavScrollY + 8;
+  const scrollingUp = currentScrollY < lastNavScrollY - 8;
+
+  document.body.classList.toggle('nav-elevated', currentScrollY > 24);
+
+  if (currentScrollY < 72 || mobileMenu?.classList.contains('open')) {
+    document.body.classList.remove('nav-hidden');
+  } else if (scrollingDown) {
+    document.body.classList.add('nav-hidden');
+  } else if (scrollingUp) {
+    document.body.classList.remove('nav-hidden');
+  }
+
+  if (Math.abs(currentScrollY - lastNavScrollY) > 8) {
+    lastNavScrollY = currentScrollY;
+  }
+}
+
+window.addEventListener('scroll', () => {
+  if (navScrollTicking) return;
+  navScrollTicking = true;
+  window.requestAnimationFrame(() => {
+    syncMobileNavOnScroll();
+    navScrollTicking = false;
+  });
+}, { passive: true });
+
+mobileNavQuery.addEventListener?.('change', syncMobileNavOnScroll);
+syncMobileNavOnScroll();
 
 document.querySelectorAll('.accordion article').forEach(item => {
   item.querySelector('button').addEventListener('click', () => {
