@@ -5,6 +5,8 @@ import logging
 import os
 import smtplib
 import ssl
+import urllib.error
+import urllib.request
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Literal
@@ -81,7 +83,62 @@ class LeadRequest(BaseModel):
     message: str | None = Field(default=None, max_length=2000)
 
 
-def send_lead_email(lead: LeadRequest):
+def format_lead_email(lead: LeadRequest) -> tuple[str, str]:
+    full_name = f"{lead.firstName.strip()} {lead.lastName.strip()}".strip()
+    subject = f"Neue AIONEX Anfrage: {full_name} ({lead.source})"
+    body = "\n".join(
+        [
+            "Neue Anfrage über das AIONEX Formular:",
+            "",
+            f"Quelle: {lead.source}",
+            f"Name: {full_name}",
+            f"Telefon: {lead.phone}",
+            f"E-Mail: {lead.email}",
+            "Einwilligung: Ja",
+            "",
+            "Nachricht / Chat-Kontext:",
+            lead.message or "-",
+        ]
+    )
+    return subject, body
+
+
+def send_lead_email_via_resend(lead: LeadRequest):
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    resend_from = os.getenv("RESEND_FROM_EMAIL", "AIONEX <onboarding@resend.dev>")
+    email_to = os.getenv("LEAD_TO_EMAIL", "aionex.info@gmail.com")
+    if not all([resend_api_key, resend_from, email_to]):
+        raise RuntimeError("Resend is not configured")
+
+    subject, body = format_lead_email(lead)
+    payload = json.dumps(
+        {
+            "from": resend_from,
+            "to": [email_to],
+            "reply_to": lead.email,
+            "subject": subject,
+            "text": body,
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {resend_api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            if response.status >= 400:
+                raise RuntimeError(f"Resend returned HTTP {response.status}")
+    except urllib.error.HTTPError as exc:
+        details = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Resend returned HTTP {exc.code}: {details}") from exc
+
+
+def send_lead_email_via_smtp(lead: LeadRequest):
     smtp_host = os.getenv("SMTP_HOST")
     smtp_port = int(os.getenv("SMTP_PORT", "587"))
     smtp_user = os.getenv("SMTP_USER")
@@ -93,28 +150,13 @@ def send_lead_email(lead: LeadRequest):
     if not all([smtp_host, smtp_user, smtp_password, smtp_from, smtp_to]):
         raise RuntimeError("SMTP is not configured")
 
-    full_name = f"{lead.firstName.strip()} {lead.lastName.strip()}".strip()
+    subject, body = format_lead_email(lead)
     message = EmailMessage()
-    message["Subject"] = f"Neue AIONEX Anfrage: {full_name} ({lead.source})"
+    message["Subject"] = subject
     message["From"] = smtp_from
     message["To"] = smtp_to
     message["Reply-To"] = lead.email
-    message.set_content(
-        "\n".join(
-            [
-                "Neue Anfrage über das AIONEX Formular:",
-                "",
-                f"Quelle: {lead.source}",
-                f"Name: {full_name}",
-                f"Telefon: {lead.phone}",
-                f"E-Mail: {lead.email}",
-                "Einwilligung: Ja",
-                "",
-                "Nachricht / Chat-Kontext:",
-                lead.message or "-",
-            ]
-        )
-    )
+    message.set_content(body)
 
     context = ssl.create_default_context(cafile=certifi.where())
     if smtp_use_ssl:
@@ -128,16 +170,26 @@ def send_lead_email(lead: LeadRequest):
             smtp.send_message(message)
 
 
+def send_lead_email(lead: LeadRequest):
+    if os.getenv("RESEND_API_KEY"):
+        send_lead_email_via_resend(lead)
+        return
+    send_lead_email_via_smtp(lead)
+
+
 @app.get("/api/health")
 async def health():
+    resend_configured = bool(os.getenv("RESEND_API_KEY"))
+    smtp_configured = bool(
+        os.getenv("SMTP_HOST")
+        and os.getenv("SMTP_USER")
+        and os.getenv("SMTP_PASSWORD")
+    )
     return {
         "ok": True,
         "configured": bool(os.getenv("OPENAI_API_KEY")),
-        "leadEmailConfigured": bool(
-            os.getenv("SMTP_HOST")
-            and os.getenv("SMTP_USER")
-            and os.getenv("SMTP_PASSWORD")
-        ),
+        "leadEmailConfigured": resend_configured or smtp_configured,
+        "leadEmailProvider": "resend" if resend_configured else "smtp" if smtp_configured else None,
     }
 
 
