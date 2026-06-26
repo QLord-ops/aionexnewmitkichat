@@ -200,7 +200,10 @@ async def lead(payload: LeadRequest):
     try:
         await run_in_threadpool(send_lead_email, payload)
     except Exception as exc:
-        logger.exception("Lead email failed: %s", type(exc).__name__)
+        logger.exception("Lead email failed: %s", exc)
+        error_detail = str(exc)
+        if os.getenv("RESEND_API_KEY") and error_detail:
+            raise HTTPException(status_code=503, detail=f"Lead email failed: {error_detail[:500]}")
         raise HTTPException(status_code=503, detail="Lead email is not configured")
     return {"ok": True}
 
