@@ -74,7 +74,7 @@ function createCookieUi() {
         <p>Sie entscheiden, welche optionalen Speicherungen erlaubt sind. Ihre Auswahl kann jederzeit im Footer geändert werden.</p>
         <label class="cookie-option"><span><b>Technisch notwendig</b><small>Speichert Ihre Einwilligungsentscheidung und ermöglicht grundlegende Funktionen.</small></span><input type="checkbox" checked disabled></label>
         <label class="cookie-option"><span><b>Komfort & Präferenzen</b><small>Speichert Theme-Auswahl, Chat-Sitzung und Chatverlauf lokal in Ihrem Browser.</small></span><input class="cookie-preferences" type="checkbox"></label>
-        <label class="cookie-option"><span><b>Marketing & AIONEX Pixel</b><small>Erlaubt den Meta Pixel mit Dataset ID 1039100638649248 zur Kampagnenmessung.</small></span><input class="cookie-marketing" type="checkbox"></label>
+        <label class="cookie-option"><span><b>Marketing & AIONEX Pixel</b><small>Erlaubt den Meta Pixel mit Dataset ID 1039100638649248 zur Kampagnenmessung.</small></span><input class="cookie-marketing" type="checkbox" checked></label>
         <p class="cookie-detail">Der KI-Chat kann Nachrichten an den AIONEX-Server und an OpenAI übertragen. Der AIONEX Pixel wird nur nach Zustimmung geladen. Details finden Sie in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
         <button type="button" class="cookie-save cookie-primary">Auswahl speichern</button>
       </section>
@@ -96,7 +96,7 @@ function createCookieUi() {
   const openSettings = () => {
     const consent = readCookieConsent();
     preferences.checked = Boolean(consent?.preferences);
-    marketing.checked = Boolean(consent?.marketing);
+    marketing.checked = consent ? Boolean(consent.marketing) : true;
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
   };
