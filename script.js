@@ -1,5 +1,6 @@
 const menuButton = document.querySelector('.menu-toggle');
 const mobileMenu = document.querySelector('.mobile-menu');
+const mobileMenuBackdrop = document.querySelector('.mobile-menu-backdrop');
 const themeButton = document.querySelector('.theme-toggle');
 
 function syncThemeButton() {
@@ -27,10 +28,51 @@ const leadDialog = leadModal?.querySelector('.lead-modal-dialog');
 const leadForm = document.querySelector('#lead-form');
 let lastModalTrigger = null;
 
+function getLeadValidationMessage(type) {
+  const language = (document.documentElement.lang || 'de').slice(0, 2).toLowerCase();
+  const messages = {
+    de: {
+      consent: 'Bitte stimmen Sie der Verarbeitung Ihrer Daten zu, um fortzufahren.',
+      required: 'Bitte füllen Sie dieses Feld aus.',
+      email: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+    },
+    en: {
+      consent: 'Please agree to the processing of your data to continue.',
+      required: 'Please fill out this field.',
+      email: 'Please enter a valid email address.',
+    },
+    ru: {
+      consent: 'Пожалуйста, согласитесь на обработку данных, чтобы продолжить.',
+      required: 'Пожалуйста, заполните это поле.',
+      email: 'Пожалуйста, введите корректный email.',
+    },
+  };
+  return (messages[language] || messages.de)[type];
+}
+
+function updateLeadValidationMessage(input) {
+  if (!input) return;
+  input.setCustomValidity('');
+  if (input.validity.valid) return;
+  if (input.name === 'consent') {
+    input.setCustomValidity(getLeadValidationMessage('consent'));
+  } else if (input.validity.typeMismatch && input.type === 'email') {
+    input.setCustomValidity(getLeadValidationMessage('email'));
+  } else if (input.validity.valueMissing) {
+    input.setCustomValidity(getLeadValidationMessage('required'));
+  }
+}
+
+function syncLeadValidationMessages() {
+  leadForm?.querySelectorAll('input').forEach(updateLeadValidationMessage);
+}
+
 function openLeadModal(trigger) {
   if (!leadModal) return;
   lastModalTrigger = trigger || document.activeElement;
   leadForm?.classList.remove('submitted');
+  leadForm?.classList.remove('has-error');
+  syncLeadValidationMessages();
   leadModal.classList.add('open');
   leadModal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('modal-open');
@@ -48,10 +90,17 @@ function closeLeadModal() {
 document.querySelectorAll('.consultation-trigger').forEach(trigger => {
   trigger.addEventListener('click', event => {
     event.preventDefault();
-    document.querySelector('.site-footer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    window.setTimeout(() => openLeadModal(trigger), 450);
+    openLeadModal(trigger);
   });
 });
+
+leadForm?.querySelectorAll('input').forEach(input => {
+  input.addEventListener('invalid', () => updateLeadValidationMessage(input));
+  input.addEventListener('input', () => updateLeadValidationMessage(input));
+  input.addEventListener('change', () => updateLeadValidationMessage(input));
+});
+
+leadForm?.querySelector('[type="submit"]')?.addEventListener('click', syncLeadValidationMessages);
 
 leadModal?.querySelectorAll('[data-modal-close]').forEach(control => {
   control.addEventListener('click', closeLeadModal);
@@ -59,6 +108,7 @@ leadModal?.querySelectorAll('[data-modal-close]').forEach(control => {
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && leadModal?.classList.contains('open')) closeLeadModal();
+  if (event.key === 'Escape' && mobileMenu?.classList.contains('open')) setMobileMenuOpen(false);
   if (event.key === 'Tab' && leadModal?.classList.contains('open')) {
     const focusable = [...leadDialog.querySelectorAll('button,input,a')].filter(el => !el.disabled);
     const first = focusable[0];
@@ -73,26 +123,64 @@ document.addEventListener('keydown', event => {
   }
 });
 
-leadForm?.addEventListener('submit', event => {
+leadForm?.addEventListener('submit', async event => {
   event.preventDefault();
+  syncLeadValidationMessages();
   if (!leadForm.reportValidity()) return;
+  const submitButton = leadForm.querySelector('[type="submit"]');
+  const formSuccess = leadForm.querySelector('.form-success');
   const data = Object.fromEntries(new FormData(leadForm).entries());
-  const leads = JSON.parse(localStorage.getItem('aionex-leads') || '[]');
-  leads.push({ ...data, createdAt: new Date().toISOString() });
-  localStorage.setItem('aionex-leads', JSON.stringify(leads));
-  leadForm.classList.add('submitted');
-  leadForm.reset();
-  window.setTimeout(closeLeadModal, 2600);
+  const payload = {
+    ...data,
+    consent: data.consent === 'on',
+  };
+
+  submitButton.disabled = true;
+  leadForm.classList.remove('has-error');
+  try {
+    const response = await fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const leads = JSON.parse(localStorage.getItem('aionex-leads') || '[]');
+    leads.push({ ...payload, createdAt: new Date().toISOString() });
+    localStorage.setItem('aionex-leads', JSON.stringify(leads));
+    if (formSuccess) {
+      formSuccess.textContent = 'Vielen Dank! Ihre Anfrage wurde gesendet. Wir melden uns innerhalb von 24 Stunden.';
+    }
+    leadForm.classList.add('submitted');
+    leadForm.reset();
+    window.setTimeout(closeLeadModal, 2600);
+  } catch (error) {
+    if (formSuccess) {
+      formSuccess.textContent = 'Die Anfrage konnte nicht gesendet werden. Bitte kontaktieren Sie uns direkt per E-Mail: aionex.info@gmail.com';
+    }
+    leadForm.classList.add('has-error');
+  } finally {
+    submitButton.disabled = false;
+  }
 });
 
+function setMobileMenuOpen(open) {
+  mobileMenu?.classList.toggle('open', open);
+  mobileMenuBackdrop?.classList.toggle('open', open);
+  document.body.classList.toggle('mobile-menu-open', open);
+  menuButton?.classList.toggle('open', open);
+  menuButton?.setAttribute('aria-expanded', String(open));
+}
+
 menuButton?.addEventListener('click', () => {
-  const open = mobileMenu.classList.toggle('open');
-  menuButton.setAttribute('aria-expanded', String(open));
+  setMobileMenuOpen(!mobileMenu?.classList.contains('open'));
 });
+
+mobileMenuBackdrop?.addEventListener('click', () => setMobileMenuOpen(false));
 
 mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
   mobileMenu.classList.remove('open');
-  menuButton.setAttribute('aria-expanded', 'false');
+  setMobileMenuOpen(false);
 }));
 
 document.querySelectorAll('.accordion article').forEach(item => {
@@ -137,6 +225,11 @@ const observer = new IntersectionObserver(entries => {
         children.forEach((child, index) => {
           child.style.transitionDelay = `${index * 110}ms`;
           child.classList.add('visible');
+          if (child.classList.contains('premium-tilt-card')) {
+            window.setTimeout(() => {
+              child.style.transitionDelay = '0ms';
+            }, 900 + index * 110);
+          }
           
           // Animate nested stats
           child.querySelectorAll('.stat-count').forEach(animateValue);
@@ -185,29 +278,51 @@ const revealSelectors = [
 document.querySelectorAll(revealSelectors.join(',')).forEach(element => observer.observe(element));
 
 // 3D Tilt Hover Effects
-document.querySelectorAll('.tilt-hover').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = -(y - centerY) / (rect.height / 18); // Max 10 deg tilt
-    const rotateY = (x - centerX) / (rect.width / 18);
-    
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-  });
-  
-  card.addEventListener('mouseleave', () => {
+document.querySelectorAll('.tilt-hover, .premium-tilt-card').forEach(card => {
+  let frame = 0;
+  let latestEvent = null;
+  const isPremiumCard = card.classList.contains('premium-tilt-card');
+  const maxTilt = isPremiumCard ? 7 : 9;
+  const lift = isPremiumCard ? -5 : 0;
+  if (isPremiumCard && card.classList.contains('visible')) {
+    card.style.transitionDelay = '0ms';
+  }
+
+  function resetTilt() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    latestEvent = null;
     if (card.classList.contains('dashboard')) {
       card.style.transform = 'perspective(1000px) rotateY(-2deg)';
     } else {
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
     }
+  }
+
+  function updateTilt() {
+    frame = 0;
+    if (!latestEvent) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = latestEvent.clientX - rect.left;
+    const y = latestEvent.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = -((y - centerY) / centerY) * maxTilt;
+    const rotateY = ((x - centerX) / centerX) * maxTilt;
+
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+    card.style.transform = `perspective(1000px) translate3d(0, ${lift}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  }
+
+  card.addEventListener('mousemove', event => {
+    if (isPremiumCard) card.style.transitionDelay = '0ms';
+    latestEvent = event;
+    if (!frame) frame = requestAnimationFrame(updateTilt);
   });
+
+  card.addEventListener('mouseleave', resetTilt);
 });
 
 
@@ -225,6 +340,7 @@ const aiChatError = aiChat?.querySelector('.ai-chat-error');
 const aiEngineStatus = aiChat?.querySelector('.ai-engine-status');
 const AI_CHAT_STORAGE = 'aionex_chat_v2';
 const AI_SESSION_STORAGE = 'aionex_chat_session';
+const AI_LEAD_SENT_STORAGE = 'aionex_chat_lead_sent';
 const AI_CHAT_API = window.AIONEX_CHAT_API || 'http://127.0.0.1:8000';
 let aiMessages = [];
 let aiStreaming = false;
@@ -240,6 +356,45 @@ function getAiSessionId() {
 
 function saveAiMessages() {
   localStorage.setItem(AI_CHAT_STORAGE, JSON.stringify(aiMessages.slice(-100)));
+}
+
+function extractChatLead(messages) {
+  const transcript = messages.map(message => message.content).join('\n');
+  const email = transcript.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0];
+  const phone = transcript.match(/(?:\+?\d[\d\s().-]{7,}\d)/)?.[0]?.trim();
+  if (!email || !phone) return null;
+
+  const nameMatch = transcript.match(/(?:name|ich heiße|mein name ist|меня зовут|имя)\s*[:\-]?\s*([A-Za-zÀ-žА-Яа-яЁё\s'-]{2,60})/i);
+  const fullName = nameMatch?.[1]?.trim().replace(/\s+/g, ' ') || '';
+  const [firstName, ...lastNameParts] = fullName.split(' ').filter(Boolean);
+  return {
+    firstName: firstName || 'Chat',
+    lastName: lastNameParts.join(' ') || 'Kontakt',
+    phone,
+    email,
+    consent: true,
+    source: 'AI Chat',
+    message: transcript.slice(-1800),
+  };
+}
+
+async function sendChatLeadIfReady() {
+  const sessionId = getAiSessionId();
+  if (localStorage.getItem(`${AI_LEAD_SENT_STORAGE}:${sessionId}`)) return;
+  const lead = extractChatLead(aiMessages);
+  if (!lead) return;
+
+  try {
+    const response = await fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lead),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    localStorage.setItem(`${AI_LEAD_SENT_STORAGE}:${sessionId}`, new Date().toISOString());
+  } catch (error) {
+    console.warn('AI chat lead email failed', error);
+  }
 }
 
 function createAiMessage(message, streaming = false) {
@@ -403,6 +558,7 @@ async function sendAiMessage(text) {
   aiMessages.push(userMessage);
   aiChatMessages.appendChild(createAiMessage(userMessage).row);
   saveAiMessages();
+  sendChatLeadIfReady();
   aiChatTyping.hidden = false;
   scrollAiChat();
 
@@ -462,6 +618,7 @@ async function sendAiMessage(text) {
     if (assistantMessage.content) {
       aiMessages.push(assistantMessage);
       saveAiMessages();
+      sendChatLeadIfReady();
     }
   } catch (error) {
     setAiEngineStatus('fallback');
@@ -491,6 +648,5 @@ aiChat?.querySelectorAll('.ai-chat-starters button').forEach(button => {
 });
 aiChat?.querySelector('.ai-chat-consultation')?.addEventListener('click', () => {
   setAiChatOpen(false);
-  document.querySelector('.site-footer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  window.setTimeout(() => openLeadModal(aiChatLaunch), 450);
+  openLeadModal(aiChatLaunch);
 });

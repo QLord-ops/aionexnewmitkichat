@@ -3,15 +3,20 @@ from __future__ import annotations
 import json
 import logging
 import os
+import smtplib
+import ssl
+from email.message import EmailMessage
 from pathlib import Path
 from typing import Literal
 
+import certifi
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
+from starlette.concurrency import run_in_threadpool
 from starlette.responses import StreamingResponse
 
 load_dotenv()
@@ -66,9 +71,80 @@ class ChatRequest(BaseModel):
     language: str = Field(default="de", max_length=5)
 
 
+class LeadRequest(BaseModel):
+    firstName: str = Field(min_length=1, max_length=100)
+    lastName: str = Field(min_length=1, max_length=100)
+    phone: str = Field(min_length=1, max_length=60)
+    email: str = Field(min_length=3, max_length=254)
+    consent: bool = True
+    source: str = Field(default="Website Formular", max_length=100)
+    message: str | None = Field(default=None, max_length=2000)
+
+
+def send_lead_email(lead: LeadRequest):
+    smtp_host = os.getenv("SMTP_HOST")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    smtp_from = os.getenv("SMTP_FROM_EMAIL") or smtp_user
+    smtp_to = os.getenv("LEAD_TO_EMAIL", "aionex.info@gmail.com")
+
+    if not all([smtp_host, smtp_user, smtp_password, smtp_from, smtp_to]):
+        raise RuntimeError("SMTP is not configured")
+
+    full_name = f"{lead.firstName.strip()} {lead.lastName.strip()}".strip()
+    message = EmailMessage()
+    message["Subject"] = f"Neue AIONEX Anfrage: {full_name} ({lead.source})"
+    message["From"] = smtp_from
+    message["To"] = smtp_to
+    message["Reply-To"] = lead.email
+    message.set_content(
+        "\n".join(
+            [
+                "Neue Anfrage über das AIONEX Formular:",
+                "",
+                f"Quelle: {lead.source}",
+                f"Name: {full_name}",
+                f"Telefon: {lead.phone}",
+                f"E-Mail: {lead.email}",
+                "Einwilligung: Ja",
+                "",
+                "Nachricht / Chat-Kontext:",
+                lead.message or "-",
+            ]
+        )
+    )
+
+    context = ssl.create_default_context(cafile=certifi.where())
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
+        smtp.starttls(context=context)
+        smtp.login(smtp_user, smtp_password)
+        smtp.send_message(message)
+
+
 @app.get("/api/health")
 async def health():
-    return {"ok": True, "configured": bool(os.getenv("OPENAI_API_KEY"))}
+    return {
+        "ok": True,
+        "configured": bool(os.getenv("OPENAI_API_KEY")),
+        "leadEmailConfigured": bool(
+            os.getenv("SMTP_HOST")
+            and os.getenv("SMTP_USER")
+            and os.getenv("SMTP_PASSWORD")
+        ),
+    }
+
+
+@app.post("/api/lead")
+async def lead(payload: LeadRequest):
+    if not payload.consent:
+        raise HTTPException(status_code=400, detail="Consent is required")
+    try:
+        await run_in_threadpool(send_lead_email, payload)
+    except Exception as exc:
+        logger.exception("Lead email failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="Lead email is not configured")
+    return {"ok": True}
 
 
 @app.post("/api/chat")
