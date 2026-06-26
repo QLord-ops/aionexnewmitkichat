@@ -5,13 +5,12 @@ import logging
 import os
 import smtplib
 import ssl
-import urllib.error
-import urllib.request
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Literal
 
 import certifi
+import resend
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -111,33 +110,19 @@ def send_lead_email_via_resend(lead: LeadRequest):
         raise RuntimeError("Resend is not configured")
 
     subject, body = format_lead_email(lead)
-    payload = json.dumps(
-        {
-            "from": resend_from,
-            "to": [email_to],
-            "reply_to": lead.email,
-            "subject": subject,
-            "text": body,
-        }
-    ).encode("utf-8")
-    request = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {resend_api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "User-Agent": "AIONEX-Backend/1.0",
-        },
-        method="POST",
-    )
+    resend.api_key = resend_api_key
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
-            if response.status >= 400:
-                raise RuntimeError(f"Resend returned HTTP {response.status}")
-    except urllib.error.HTTPError as exc:
-        details = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Resend returned HTTP {exc.code}: {details}") from exc
+        resend.Emails.send(
+            {
+                "from": resend_from,
+                "to": [email_to],
+                "reply_to": lead.email,
+                "subject": subject,
+                "text": body,
+            }
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Resend send failed: {exc}") from exc
 
 
 def send_lead_email_via_smtp(lead: LeadRequest):
