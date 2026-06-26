@@ -126,6 +126,8 @@ def send_lead_email_via_resend(lead: LeadRequest):
         headers={
             "Authorization": f"Bearer {resend_api_key}",
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "AIONEX-Backend/1.0",
         },
         method="POST",
     )
