@@ -1,0 +1,43 @@
+AIONEX website files for IONOS
+
+Upload the contents of this folder to the web root of your IONOS hosting
+(usually /htdocs or the folder assigned to aionex.studio).
+
+Files to upload:
+- index.html
+- en.html
+- favicon.ico
+- styles.css
+- script.js
+- cookies.css
+- cookies.js
+- legal.css
+- impressum.html
+- datenschutz.html
+- cookies.html
+- robots.txt
+- sitemap.xml
+- .htaccess
+- assets/
+
+Important:
+This package contains the public static website only. The contact form and AI
+chat require the FastAPI backend from the backend/ folder to be hosted on a
+Python-capable server (for example IONOS VPS, Render, Railway, Fly.io or another
+backend host). Standard IONOS Webhosting usually does not run FastAPI apps.
+
+If the backend is hosted on another domain/subdomain, set this before script.js:
+<script>
+  window.AIONEX_CHAT_API = 'https://api.aionex.studio';
+</script>
+
+Recommended DNS:
+- aionex.studio -> IONOS webspace
+- www.aionex.studio -> same webspace or redirect to aionex.studio
+- api.aionex.studio -> backend server, if used separately
+
+After upload:
+1. Open https://aionex.studio/
+2. Check https://aionex.studio/en.html
+3. Check https://aionex.studio/sitemap.xml
+4. If backend is connected, test the contact form and AI chat.
